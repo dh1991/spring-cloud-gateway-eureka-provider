@@ -1,0 +1,10 @@
+eureka:
+  client:
+    serviceUrl:
+        defaultZone: http://127.0.0.1:9080/eureka/
+
+server:
+  port: 9081
+spring:
+  application:
+    name: provider-a

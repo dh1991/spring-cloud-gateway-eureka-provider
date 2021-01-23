@@ -1,0 +1,48 @@
+test:
+  #  hostport: httpbin.org:80
+  #  hostport: localhost:5000
+  #  uri: http://${test.hostport}
+  uri: lb://PROVIDER-A
+  uriA: lb://PROVIDER-B
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:9080/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}@${spring.cloud.client.ip-address}@${server.port}
+spring:
+  jmx:
+    enabled: false
+  cloud:
+    gateway:
+      routes:
+        - id: default_path_to_httpbin
+          uri: ${test.uri}
+          order: 10000
+          predicates:
+            - Path=/providerA/**
+        - id: default_path_to_httpbinB
+          uri: ${test.uriA}
+          order: 10000
+          predicates:
+            - Path=/providerB/**
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+  application:
+    name: gateway
+
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.http.server.reactive: DEBUG
+    org.springframework.web.reactive: DEBUG
+    reactor.ipc.netty: DEBUG
+    reactor.netty: DEBUG
+
+management.endpoints.web.exposure.include: '*'
+server:
+  port: 9083
